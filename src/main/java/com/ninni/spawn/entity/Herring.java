@@ -35,7 +35,7 @@ public class Herring extends BoidFishEntity {
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
         if (mobSpawnType != MobSpawnType.BUCKET) {
-            this.setSchoolSize(random.nextInt(15) + 5);
+            this.setSchoolSize(random.nextInt(20) + 10);
         }
         return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
     }
