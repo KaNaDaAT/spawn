@@ -4,9 +4,11 @@ import com.ninni.spawn.registry.SpawnSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,14 +23,32 @@ public class StrippablePlankBlock extends Block {
     }
 
     @Override
-    public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-        if (player.getItemInHand(interactionHand).getItem() instanceof AxeItem) {
+    protected ItemInteractionResult useItemOn(
+            ItemStack itemStack,
+            BlockState blockState,
+            Level level,
+            BlockPos blockPos,
+            Player player,
+            InteractionHand hand,
+            BlockHitResult hit) {
+        if (itemStack.getItem() instanceof AxeItem) {
             level.setBlock(blockPos, strippedBlockState, 4);
-            level.playSound(player, blockPos, SpawnSoundEvents.ROTTEN_WOOD_CRACK, SoundSource.BLOCKS, 1.0f, 1.0f);
-            player.getItemInHand(interactionHand).hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(interactionHand));
-            return InteractionResult.SUCCESS;
+
+            level.playSound(
+                    player,
+                    blockPos,
+                    SpawnSoundEvents.ROTTEN_WOOD_CRACK,
+                    SoundSource.BLOCKS,
+                    1.0f,
+                    1.0f);
+            EquipmentSlot slot = hand == InteractionHand.MAIN_HAND
+                    ? EquipmentSlot.MAINHAND
+                    : EquipmentSlot.OFFHAND;
+
+            itemStack.hurtAndBreak(1, player, slot);
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        return super.use(blockState, level, blockPos, player, interactionHand, blockHitResult);
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 }

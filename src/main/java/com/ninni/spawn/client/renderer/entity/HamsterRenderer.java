@@ -16,10 +16,10 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 
 @Environment(value=EnvType.CLIENT)
 public class HamsterRenderer<E extends Hamster> extends MobRenderer<E, HamsterModel<E>> {
-    public static final ResourceLocation HAMSTER_GOLDEN_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/hamster/golden.png");
-    public static final ResourceLocation HAMSTER_ROBOROWSKI_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/hamster/roborowski.png");
-    public static final ResourceLocation HAMSTER_RUSSIAN_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/hamster/russian.png");
-    public static final ResourceLocation HAMSTER_TURKISH_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/hamster/turkish.png");
+    public static final ResourceLocation HAMSTER_GOLDEN_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/hamster/golden.png");
+    public static final ResourceLocation HAMSTER_ROBOROWSKI_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/hamster/roborowski.png");
+    public static final ResourceLocation HAMSTER_RUSSIAN_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/hamster/russian.png");
+    public static final ResourceLocation HAMSTER_TURKISH_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/hamster/turkish.png");
     private final HamsterModel<E> normalModel, standingModel;
 
     public HamsterRenderer(EntityRendererProvider.Context ctx) {

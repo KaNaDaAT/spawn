@@ -8,7 +8,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import org.jetbrains.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 public class BigSnailShellBlock extends HorizontalDirectionalBlock {
+
+    public static final MapCodec<BigSnailShellBlock> CODEC = simpleCodec(BigSnailShellBlock::new);
 
     public BigSnailShellBlock(Block.Properties settings) {
         super(settings);
@@ -24,5 +28,10 @@ public class BigSnailShellBlock extends HorizontalDirectionalBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
     }
 }

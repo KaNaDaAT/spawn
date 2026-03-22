@@ -22,6 +22,6 @@ public class SpawnPointsOfInterests {
     }
 
     private static PoiType register(String id, Set<BlockState> workStationStates, int ticketCount, int searchDistance) {
-        return PointOfInterestHelper.register(new ResourceLocation(MOD_ID, id), ticketCount, searchDistance, workStationStates);
+        return PointOfInterestHelper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), ticketCount, searchDistance, workStationStates);
     }
 }

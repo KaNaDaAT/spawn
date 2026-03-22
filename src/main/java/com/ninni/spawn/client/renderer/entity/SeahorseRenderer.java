@@ -13,12 +13,12 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 
 @Environment(EnvType.CLIENT)
 public class SeahorseRenderer extends MobRenderer<Seahorse, SeahorseModel<Seahorse>> {
-    private static final ResourceLocation SEAHORSE_BLACK_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/black.png");
-    private static final ResourceLocation SEAHORSE_BLUE_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/blue.png");
-    private static final ResourceLocation SEAHORSE_ORANGE_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/orange.png");
-    private static final ResourceLocation SEAHORSE_PURPLE_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/purple.png");
-    private static final ResourceLocation SEAHORSE_WHITE_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/white.png");
-    private static final ResourceLocation SEAHORSE_YELLOW_LOCATION = new ResourceLocation(MOD_ID, "textures/entity/seahorse/yellow.png");
+    private static final ResourceLocation SEAHORSE_BLACK_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/black.png");
+    private static final ResourceLocation SEAHORSE_BLUE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/blue.png");
+    private static final ResourceLocation SEAHORSE_ORANGE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/orange.png");
+    private static final ResourceLocation SEAHORSE_PURPLE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/purple.png");
+    private static final ResourceLocation SEAHORSE_WHITE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/white.png");
+    private static final ResourceLocation SEAHORSE_YELLOW_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/seahorse/yellow.png");
 
     public SeahorseRenderer(EntityRendererProvider.Context context) {
         super(context, new SeahorseModel<>(context.bakeLayer(SpawnEntityModelLayers.SEAHORSE)), 0.3f);

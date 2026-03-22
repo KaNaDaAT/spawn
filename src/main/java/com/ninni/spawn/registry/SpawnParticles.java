@@ -12,6 +12,6 @@ public interface SpawnParticles {
     SimpleParticleType TUNA_EGG = register("tuna_egg", FabricParticleTypes.simple());
 
     private static SimpleParticleType register(String id, SimpleParticleType type) {
-        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, new ResourceLocation(Spawn.MOD_ID, id), type);
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, id), type);
     }
 }

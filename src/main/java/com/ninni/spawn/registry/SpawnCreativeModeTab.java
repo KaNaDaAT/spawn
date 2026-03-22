@@ -44,7 +44,7 @@ public class SpawnCreativeModeTab {
             entries.addAfter(Items.COD_BUCKET, ANGLER_FISH_BUCKET);
             entries.addAfter(Items.TROPICAL_FISH_BUCKET, SEAHORSE_BUCKET);
             entries.addAfter(Items.MILK_BUCKET, ANT_PUPA);
-            entries.addAfter(Items.MUSIC_DISC_RELIC, MUSIC_DISC_ROT);
+            // entries.addAfter(Items.MUSIC_DISC_RELIC, MUSIC_DISC_ROT);
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.REDSTONE_BLOCKS).register(entries -> {
@@ -83,7 +83,7 @@ public class SpawnCreativeModeTab {
             entries.addAfter(Items.BURN_POTTERY_SHERD, CROWN_POTTERY_SHERD);
             entries.addAfter(Items.SNORT_POTTERY_SHERD, SPADE_POTTERY_SHERD);
             entries.addAfter(Items.HONEYCOMB, SNAIL_SHELL);
-            entries.addAfter(Items.SCUTE, MUCUS);
+            entries.addAfter(Items.TURTLE_SCUTE, MUCUS);
         });
 
         ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.SPAWN_EGGS).register(entries -> {
@@ -151,13 +151,13 @@ public class SpawnCreativeModeTab {
                 output.accept(ROTTEN_TRAPDOOR);
                 output.accept(FALLEN_LEAVES);
                 output.accept(ANT_PUPA);
-                output.accept(MUSIC_DISC_ROT);
+                // output.accept(MUSIC_DISC_ROT);
                 output.accept(CROWN_POTTERY_SHERD);
                 output.accept(SPADE_POTTERY_SHERD);
             }).build()
     );
 
     private static CreativeModeTab register(String id, CreativeModeTab tab) {
-        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(Spawn.MOD_ID, id), tab);
+        return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, id), tab);
     }
 }

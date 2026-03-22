@@ -1,5 +1,6 @@
 package com.ninni.spawn.block;
 
+import com.mojang.serialization.MapCodec;
 import com.ninni.spawn.SpawnProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,30 +16,38 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation")
 public class FallenLeavesBlock extends BushBlock {
     public static final IntegerProperty AMOUNT = SpawnProperties.LEAVES;
     private static final VoxelShape SHAPE = box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
+
+    public static final MapCodec<FallenLeavesBlock> CODEC = simpleCodec(FallenLeavesBlock::new);
 
     public FallenLeavesBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(((this.stateDefinition.any())).setValue(AMOUNT, 1));
     }
 
-
     @Override
-    public boolean canBeReplaced(BlockState blockState, BlockPlaceContext blockPlaceContext) {
-        return (!blockPlaceContext.isSecondaryUseActive() && blockPlaceContext.getItemInHand().is(this.asItem()) && blockState.getValue(AMOUNT) < 4) || super.canBeReplaced(blockState, blockPlaceContext);
+    protected MapCodec<? extends BushBlock> codec() {
+        return CODEC;
     }
 
     @Override
-    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+    public boolean canBeReplaced(BlockState blockState, BlockPlaceContext blockPlaceContext) {
+        return (!blockPlaceContext.isSecondaryUseActive() && blockPlaceContext.getItemInHand().is(this.asItem())
+                && blockState.getValue(AMOUNT) < 4) || super.canBeReplaced(blockState, blockPlaceContext);
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos,
+            CollisionContext collisionContext) {
         return SHAPE;
     }
 
     @Override
     protected boolean mayPlaceOn(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos) {
-        return !blockState.getCollisionShape(blockGetter, blockPos).getFaceShape(Direction.UP).isEmpty() || blockState.isFaceSturdy(blockGetter, blockPos, Direction.UP);
+        return !blockState.getCollisionShape(blockGetter, blockPos).getFaceShape(Direction.UP).isEmpty()
+                || blockState.isFaceSturdy(blockGetter, blockPos, Direction.UP);
     }
 
     @Nullable
@@ -53,8 +62,9 @@ public class FallenLeavesBlock extends BushBlock {
     }
 
     @Override
-    public boolean isPathfindable(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, PathComputationType pathComputationType) {
-        return (pathComputationType == PathComputationType.AIR && !this.hasCollision) || super.isPathfindable(blockState, blockGetter, blockPos, pathComputationType);
+    public boolean isPathfindable(BlockState state, PathComputationType type) {
+        return (type == PathComputationType.AIR && !this.hasCollision)
+                || super.isPathfindable(state, type);
     }
 
     @Override

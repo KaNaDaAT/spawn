@@ -13,20 +13,23 @@ import net.minecraft.world.item.DyeColor;
 
 import static com.ninni.spawn.Spawn.MOD_ID;
 
-@Environment(value= EnvType.CLIENT)
+@Environment(value = EnvType.CLIENT)
 public class AbdomenLayer extends RenderLayer<Ant, AntModel<Ant>> {
-    private static final ResourceLocation ANT_ABDOMEN_LOCATION = new ResourceLocation(MOD_ID,"textures/entity/ant/ant_abdomen.png");
+    private static final ResourceLocation ANT_ABDOMEN_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID,
+            "textures/entity/ant/ant_abdomen.png");
 
     public AbdomenLayer(RenderLayerParent<Ant, AntModel<Ant>> renderLayerParent) {
         super(renderLayerParent);
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, Ant ant, float f, float g, float h, float j, float k, float l) {
+    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, Ant ant, float f, float g,
+            float h, float j, float k, float l) {
         float u;
         float t;
         float s;
-        if (ant.isInvisible() || !ant.isTame()) return;
+        if (ant.isInvisible() || !ant.isTame())
+            return;
 
         if (ant.hasCustomName() && "jeb_".equals(ant.getName().getString())) {
             int m = 25;
@@ -34,7 +37,7 @@ public class AbdomenLayer extends RenderLayer<Ant, AntModel<Ant>> {
             int o = DyeColor.values().length;
             int p = n % o;
             int q = (n + 1) % o;
-            float r = ((float)(ant.tickCount % 25) + h) / 25.0f;
+            float r = ((float) (ant.tickCount % 25) + h) / 25.0f;
             float[] fs = Ant.getColorArray(DyeColor.byId(p));
             float[] gs = Ant.getColorArray(DyeColor.byId(q));
             s = fs[0] * (1.0f - r) + gs[0] * r;
@@ -46,7 +49,18 @@ public class AbdomenLayer extends RenderLayer<Ant, AntModel<Ant>> {
             t = hs[1];
             u = hs[2];
         }
-        renderColoredCutoutModel(this.getParentModel(), ANT_ABDOMEN_LOCATION, poseStack, multiBufferSource, i, ant, s, t, u);
+        int color = ((int) (1.0F * 255) << 24) | // alpha
+                ((int) (s * 255) << 16) | // red
+                ((int) (t * 255) << 8) | // green
+                ((int) (u * 255)); // blue
+
+        renderColoredCutoutModel(
+                this.getParentModel(),
+                ANT_ABDOMEN_LOCATION,
+                poseStack,
+                multiBufferSource,
+                i,
+                ant,
+                color);
     }
 }
-

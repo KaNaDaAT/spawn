@@ -29,20 +29,14 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -64,7 +58,6 @@ public class Snail extends Animal {
 
     public Snail(EntityType<? extends Snail> entityType, Level world) {
         super(entityType, world);
-        this.setMaxUpStep(1);
     }
 
     @Override
@@ -111,16 +104,17 @@ public class Snail extends Animal {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 6.0)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0)
-                .add(Attributes.MOVEMENT_SPEED, 0.1);
+                .add(Attributes.MOVEMENT_SPEED, 0.1)
+                .add(Attributes.STEP_HEIGHT, 1.0);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(SCARED_TICKS, 0);
-        this.entityData.define(WET_TICKS, 0);
-        this.entityData.define(SHELL_GROWTH, 0);
-        this.entityData.define(HAS_EGG, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SCARED_TICKS, 0);
+        builder.define(WET_TICKS, 0);
+        builder.define(SHELL_GROWTH, 0);
+        builder.define(HAS_EGG, false);
     }
 
     @Override

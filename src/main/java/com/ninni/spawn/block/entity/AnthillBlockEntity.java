@@ -2,10 +2,10 @@ package com.ninni.spawn.block.entity;
 
 import com.google.common.collect.Lists;
 import com.ninni.spawn.block.AnthillBlock;
-import com.ninni.spawn.entity.Ant;
 import com.ninni.spawn.registry.SpawnBlockEntityTypes;
 import com.ninni.spawn.registry.SpawnSoundEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -15,11 +15,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.Bee;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BeehiveBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -35,35 +32,34 @@ public class AnthillBlockEntity extends BlockEntity {
     public static final String ENTITY_DATA_KEY = "EntityData";
     public static final String TICKS_IN_ANTHILL_KEY = "TicksInAnthill";
     public static final String ANTS_KEY = "Ants";
-    private static final List<String> IGNORED_ANT_TAGS =
-            Arrays.asList(
-                    "Bees",
-                    "Air",
-                    "ArmorDropChances",
-                    "ArmorItems",
-                    "Brain",
-                    "CanPickUpLoot",
-                    "DeathTime",
-                    "FallDistance",
-                    "FallFlying",
-                    "Fire",
-                    "HandDropChances",
-                    "HandItems",
-                    "HurtByTimestamp",
-                    "HurtTime",
-                    "LeftHanded",
-                    "Motion",
-                    "NoGravity",
-                    "OnGround",
-                    "PortalCooldown",
-                    "Pos",
-                    "Rotation",
-                    "CannotEnterAnthillTicks",
-                    "TicksSinceGathering",
-                    "AnthillPos",
-                    "Passengers",
-                    "Leash",
-                    "UUID");
+    private static final List<String> IGNORED_ANT_TAGS = Arrays.asList(
+            "Bees",
+            "Air",
+            "ArmorDropChances",
+            "ArmorItems",
+            "Brain",
+            "CanPickUpLoot",
+            "DeathTime",
+            "FallDistance",
+            "FallFlying",
+            "Fire",
+            "HandDropChances",
+            "HandItems",
+            "HurtByTimestamp",
+            "HurtTime",
+            "LeftHanded",
+            "Motion",
+            "NoGravity",
+            "OnGround",
+            "PortalCooldown",
+            "Pos",
+            "Rotation",
+            "CannotEnterAnthillTicks",
+            "TicksSinceGathering",
+            "AnthillPos",
+            "Passengers",
+            "Leash",
+            "UUID");
     private final List<Ant> ants = Lists.newArrayList();
     @Nullable
     private BlockPos savedResourcePos;
@@ -86,8 +82,10 @@ public class AnthillBlockEntity extends BlockEntity {
         List<Entity> list = this.tryReleaseAnt(state, antState);
         if (player != null) {
             for (Entity entity : list) {
-                if (!(entity instanceof com.ninni.spawn.entity.Ant ant)) continue;
-                if (!(player.position().distanceToSqr(entity.position()) <= 16.0)) continue;
+                if (!(entity instanceof com.ninni.spawn.entity.Ant ant))
+                    continue;
+                if (!(player.position().distanceToSqr(entity.position()) <= 16.0))
+                    continue;
                 ant.setTarget(player);
                 ant.setStayOutOfAnthillCountdown(400);
             }
@@ -102,9 +100,11 @@ public class AnthillBlockEntity extends BlockEntity {
         ArrayList<Entity> list = Lists.newArrayList();
         this.ants.removeIf(ant -> {
             assert this.level != null;
-            return AnthillBlockEntity.releaseAnt(this.level, this.worldPosition, state, ant, list, antState, this.savedResourcePos);
+            return AnthillBlockEntity.releaseAnt(this.level, this.worldPosition, state, ant, list, antState,
+                    this.savedResourcePos);
         });
-        if (!list.isEmpty()) super.setChanged();
+        if (!list.isEmpty())
+            super.setChanged();
         return list;
     }
 
@@ -129,7 +129,8 @@ public class AnthillBlockEntity extends BlockEntity {
                 }
                 this.hasResource = ant.hasResource();
             }
-            this.level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(), SpawnSoundEvents.ANTHILL_ENTER, SoundSource.BLOCKS, 1.0f, 1.0f);
+            this.level.playSound(null, blockPos.getX(), blockPos.getY(), blockPos.getZ(),
+                    SpawnSoundEvents.ANTHILL_ENTER, SoundSource.BLOCKS, 1.0f, 1.0f);
             this.level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(entity, this.getBlockState()));
         }
         entity.discard();
@@ -141,7 +142,8 @@ public class AnthillBlockEntity extends BlockEntity {
         this.ants.add(new Ant(nbtCompound, ticksInAnthill, (bl ? 2400 : 600) + random.nextInt(600)));
     }
 
-    private static boolean releaseAnt(Level world, BlockPos pos, BlockState state, Ant ant, @Nullable List<Entity> entities, AntState antState, BlockPos resourcePos) {
+    private static boolean releaseAnt(Level world, BlockPos pos, BlockState state, Ant ant,
+            @Nullable List<Entity> entities, AntState antState, BlockPos resourcePos) {
         if (world.isNight() && antState != AntState.EMERGENCY) {
             return false;
         }
@@ -150,7 +152,8 @@ public class AnthillBlockEntity extends BlockEntity {
         nbtCompound.put("AnthillPos", NbtUtils.writeBlockPos(pos));
         boolean bl = !world.getBlockState(pos.above()).getCollisionShape(world, pos.above()).isEmpty();
 
-        if (bl && antState != AntState.EMERGENCY) return false;
+        if (bl && antState != AntState.EMERGENCY)
+            return false;
         Entity newAnt = EntityType.loadEntityRecursive(nbtCompound, world, entity -> entity);
         if (newAnt != null) {
             if (newAnt instanceof com.ninni.spawn.entity.Ant releasedAnt) {
@@ -165,16 +168,20 @@ public class AnthillBlockEntity extends BlockEntity {
                     }
                 }
                 AnthillBlockEntity.ageAnt(Ant.ticksInAnthill, releasedAnt);
-                if (entities != null) entities.add(releasedAnt);
-                double x = (double)pos.getX() + 0.5;
-                double y = (double)pos.getY() + 1;
-                double z = (double)pos.getZ() + 0.5;
+                if (entities != null)
+                    entities.add(releasedAnt);
+                double x = (double) pos.getX() + 0.5;
+                double y = (double) pos.getY() + 1;
+                double z = (double) pos.getZ() + 0.5;
                 releasedAnt.moveTo(x, y, z, releasedAnt.getYRot(), releasedAnt.getXRot());
-            } else return false;
+            } else
+                return false;
             world.playSound(null, pos, SpawnSoundEvents.ANTHILL_EXIT, SoundSource.BLOCKS, 1.0f, 1.0f);
             world.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(releasedAnt, world.getBlockState(pos)));
             if (world instanceof ServerLevel serverLevel) {
-                releasedAnt.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(releasedAnt.blockPosition()), MobSpawnType.EVENT, null, nbtCompound);
+                releasedAnt.finalizeSpawn(serverLevel,
+                        serverLevel.getCurrentDifficultyAt(releasedAnt.blockPosition()),
+                        MobSpawnType.EVENT, null);
             }
             return world.addFreshEntity(releasedAnt);
         }
@@ -182,16 +189,20 @@ public class AnthillBlockEntity extends BlockEntity {
     }
 
     static void removeIrrelevantNbtKeys(CompoundTag compound) {
-        for (String string : IGNORED_ANT_TAGS) compound.remove(string);
+        for (String string : IGNORED_ANT_TAGS)
+            compound.remove(string);
     }
 
     private static void ageAnt(int ticks, com.ninni.spawn.entity.Ant ant) {
         int i = ant.getAge();
-        if (i < 0) ant.setAge(Math.min(0, i + ticks));
-        else if (i > 0) ant.setAge(Math.max(0, i - ticks));
+        if (i < 0)
+            ant.setAge(Math.min(0, i + ticks));
+        else if (i > 0)
+            ant.setAge(Math.max(0, i - ticks));
     }
 
-    private static void tickAnts(Level world, BlockPos pos, BlockState state, List<Ant> ants, BlockPos resourcePos, boolean hasResource) {
+    private static void tickAnts(Level world, BlockPos pos, BlockState state, List<Ant> ants, BlockPos resourcePos,
+            boolean hasResource) {
         boolean bl = false;
         Iterator<Ant> iterator = ants.iterator();
         while (iterator.hasNext()) {
@@ -205,39 +216,50 @@ public class AnthillBlockEntity extends BlockEntity {
             }
             ++Ant.ticksInAnthill;
         }
-        if (bl) AnthillBlockEntity.setChanged(world, pos, state);
+        if (bl)
+            AnthillBlockEntity.setChanged(world, pos, state);
     }
 
     public static void serverTick(Level world, BlockPos pos, BlockState state, AnthillBlockEntity blockEntity) {
-        AnthillBlockEntity.tickAnts(world, pos, state, blockEntity.ants, blockEntity.savedResourcePos, blockEntity.hasResource);
+        AnthillBlockEntity.tickAnts(world, pos, state, blockEntity.ants, blockEntity.savedResourcePos,
+                blockEntity.hasResource);
         if (!blockEntity.ants.isEmpty() && world.getRandom().nextDouble() < 0.005) {
-            double d = (double)pos.getX() + 0.5;
+            double d = (double) pos.getX() + 0.5;
             double e = pos.getY();
-            double f = (double)pos.getZ() + 0.5;
+            double f = (double) pos.getZ() + 0.5;
             world.playSound(null, d, e, f, SpawnSoundEvents.ANTHILL_WORK, SoundSource.BLOCKS, 0.5f, 1.0f);
         }
     }
 
     @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.loadAdditional(nbt, registries);
+
         this.ants.clear();
+
         ListTag nbtList = nbt.getList(ANTS_KEY, 10);
         for (int i = 0; i < nbtList.size(); ++i) {
             CompoundTag nbtCompound = nbtList.getCompound(i);
-            Ant ant = new Ant(nbtCompound.getCompound(ENTITY_DATA_KEY), nbtCompound.getInt(TICKS_IN_ANTHILL_KEY), nbtCompound.getInt(MIN_OCCUPATION_TICKS_KEY));
+
+            Ant ant = new Ant(
+                    nbtCompound.getCompound(ENTITY_DATA_KEY),
+                    nbtCompound.getInt(TICKS_IN_ANTHILL_KEY),
+                    nbtCompound.getInt(MIN_OCCUPATION_TICKS_KEY));
+
             this.ants.add(ant);
         }
+
         this.hasResource = nbt.getBoolean("HasResource");
+
         this.savedResourcePos = null;
-        if (nbt.contains("ResourcePos")) {
-            this.savedResourcePos = NbtUtils.readBlockPos(nbt.getCompound("ResourcePos"));
+        if (nbt.contains("ResourcePos", CompoundTag.TAG_INT_ARRAY)) {
+            this.savedResourcePos = NbtUtils.readBlockPos(nbt, "ResourcePos").orElse(null);
         }
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt) {
-        super.saveAdditional(nbt);
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+        super.saveAdditional(nbt, registries);
         nbt.put(ANTS_KEY, this.getAnts());
         nbt.putBoolean("HasResource", this.hasResource);
         if (this.savedResourcePos != null) {

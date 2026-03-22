@@ -21,7 +21,7 @@ import java.util.List;
 
 public class AntMoundBlock extends BrushableBlock {
     public AntMoundBlock(Block block, Properties properties, SoundEvent soundEvent, SoundEvent soundEvent2) {
-        super(block, properties, soundEvent, soundEvent2);
+        super(block, soundEvent, soundEvent2, properties);
     }
 
     @Override

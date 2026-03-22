@@ -21,7 +21,8 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 @Environment(EnvType.CLIENT)
 public class BioluminescenceLayer<T extends AnglerFish> extends EyesLayer<T, AnglerFishModel<T>> {
     private final Predicate<T> predicate;
-    private static final RenderType BIOLUMINESCENCE = RenderType.entityTranslucentEmissive(new ResourceLocation(MOD_ID, "textures/entity/angler_fish/angler_fish_bioluminescence.png"));
+    private static final RenderType BIOLUMINESCENCE = RenderType.entityTranslucentEmissive(ResourceLocation
+            .fromNamespaceAndPath(MOD_ID, "textures/entity/angler_fish/angler_fish_bioluminescence.png"));
 
     public BioluminescenceLayer(RenderLayerParent<T, AnglerFishModel<T>> renderLayerParent, Predicate<T> predicate) {
         super(renderLayerParent);
@@ -29,10 +30,33 @@ public class BioluminescenceLayer<T extends AnglerFish> extends EyesLayer<T, Ang
     }
 
     @Override
-    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, T entity, float f, float g, float h, float j, float k, float l) {
-        if (!this.predicate.test(entity)) return;
+    public void render(
+            PoseStack poseStack,
+            MultiBufferSource multiBufferSource,
+            int light,
+            T entity,
+            float limbSwing,
+            float limbSwingAmount,
+            float ageInTicks,
+            float netHeadYaw,
+            float headPitch,
+            float partialTick) {
+        if (!this.predicate.test(entity))
+            return;
+
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(this.renderType());
-        ((Model)this.getParentModel()).renderToBuffer(poseStack, vertexConsumer, 0xF00000, OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+
+        int color = ((int) (1.0F * 255) << 24) | // alpha
+                ((int) (1.0F * 255) << 16) | // red
+                ((int) (1.0F * 255) << 8) | // green
+                ((int) (1.0F * 255)); // blue
+
+        ((Model) this.getParentModel()).renderToBuffer(
+                poseStack,
+                vertexConsumer,
+                light,
+                OverlayTexture.NO_OVERLAY,
+                color);
     }
 
     @Override
@@ -40,4 +64,3 @@ public class BioluminescenceLayer<T extends AnglerFish> extends EyesLayer<T, Ang
         return BIOLUMINESCENCE;
     }
 }
-

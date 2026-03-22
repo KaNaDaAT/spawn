@@ -4,7 +4,9 @@ import com.ninni.spawn.registry.SpawnEntityType;
 import com.ninni.spawn.registry.SpawnItems;
 import com.ninni.spawn.registry.SpawnParticles;
 import com.ninni.spawn.registry.SpawnSoundEvents;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,18 +48,15 @@ public class TunaEgg extends Mob implements Bucketable {
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
-        if (mobSpawnType == MobSpawnType.BUCKET && compoundTag != null && compoundTag.contains(BUCKET_VARIANT_TAG, 3)) {
-            this.setHatchTicks(compoundTag.getInt(BUCKET_VARIANT_TAG));
-            return spawnGroupData;
-        }
-        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
+        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
     }
 
     @Override
-    public boolean canBreatheUnderwater() {
-        return true;
+    public int getMaxAirSupply() {
+        return TOTAL_AIR_SUPPLY;
     }
+    
     @Override
     public boolean hurt(DamageSource damageSource, float f) {
         long l = this.level().getGameTime();
@@ -76,15 +75,16 @@ public class TunaEgg extends Mob implements Bucketable {
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
-        CompoundTag compoundTag = itemStack.getOrCreateTag();
-        compoundTag.putInt(BUCKET_VARIANT_TAG, this.getHatchTicks());
+        CustomData.update(DataComponents.CUSTOM_DATA, itemStack, tag -> {
+            tag.putInt(BUCKET_VARIANT_TAG, this.getHatchTicks());
+        });
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(FROM_BUCKET, false);
-        this.entityData.define(HATCH_TICKS, 5 * 20 * 60);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(FROM_BUCKET, false);
+        builder.define(HATCH_TICKS, 5 * 20 * 60);
     }
 
     @Override

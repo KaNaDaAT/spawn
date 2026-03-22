@@ -33,7 +33,6 @@ import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,11 +56,11 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
         HamsterVariant[] variants = HamsterVariant.values();
         HamsterVariant variant = Util.getRandom(variants, serverLevelAccessor.getRandom());
         this.setVariant(variant);
-        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
+        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
     }
 
     @Override
@@ -74,7 +73,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Cat.class, 24.0f, 1.1, 1.3));
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.0F));
         this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 1.0, true));
-        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0, 7f, 2.0f, false));
+        this.goalSelector.addGoal(6, new FollowOwnerGoal(this, 1.0, 7f, 2.0f));
         this.goalSelector.addGoal(7, new TemptGoal(this, 1.2, Ingredient.of(SpawnTags.HAMSTER_TEMPTS), false));
         this.goalSelector.addGoal(9, new HamsterSearchForItemsGoal());
         this.goalSelector.addGoal(10, new WaterAvoidingRandomStrollGoal(this, 1));
@@ -177,7 +176,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         super.dropEquipment();
         this.inventory.removeAllItems().forEach(this::spawnAtLocation);
         ItemStack itemStack = this.getItemBySlot(EquipmentSlot.MAINHAND);
-        if (!itemStack.isEmpty() && !EnchantmentHelper.hasVanishingCurse(itemStack)) {
+        if (!itemStack.isEmpty()) {
             this.spawnAtLocation(itemStack);
             this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         }
@@ -193,20 +192,20 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(VARIANT, HamsterVariant.RUSSIAN.id());
-        this.entityData.define(DATA_FLAGS_ID, (byte)0);
-        this.entityData.define(PUFF_TICKS, 0.0F);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(VARIANT, HamsterVariant.RUSSIAN.id());
+        builder.define(DATA_FLAGS_ID, (byte)0);
+        builder.define(PUFF_TICKS, 0.0F);
     }
 
     @Override
-    public void setTame(boolean bl) {
-        super.setTame(bl);
-        if (bl) {
+    public void setTame(boolean bl, boolean updateAttributes) {
+        super.setTame(bl, updateAttributes);
+        if (bl && updateAttributes) {
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(12.0);
             this.setHealth(20.0f);
-        } else {
+        } else if (updateAttributes) {
             this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(6.0);
         }
     }
@@ -316,7 +315,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
-        this.writeInventoryToTag(compoundTag);
+        this.writeInventoryToTag(compoundTag, this.registryAccess());
         compoundTag.putInt("Variant", this.getVariant().id());
         compoundTag.putBoolean("Standing", this.isStanding());
         ListTag listTag = new ListTag();
@@ -325,8 +324,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
             if (itemStack.isEmpty()) continue;
             CompoundTag compoundTag2 = new CompoundTag();
             compoundTag2.putByte("Slot", (byte)i);
-            itemStack.save(compoundTag2);
-            listTag.add(compoundTag2);
+            listTag.add(itemStack.save(this.registryAccess(), compoundTag2));
         }
         compoundTag.put("Items", listTag);
     }
@@ -334,7 +332,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     @Override
     public void readAdditionalSaveData(CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
-        this.readInventoryFromTag(compoundTag);
+        this.readInventoryFromTag(compoundTag, this.registryAccess());
         this.setVariant(HamsterVariant.byId(compoundTag.getInt("Variant")));
         this.setStanding(compoundTag.getBoolean("Standing"));
         ListTag listTag = compoundTag.getList("Items", 10);
@@ -342,7 +340,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
             CompoundTag compoundTag2 = listTag.getCompound(i);
             int j = compoundTag2.getByte("Slot") & 0xFF;
             if (j < 2 || j >= this.inventory.getContainerSize()) continue;
-            this.inventory.setItem(j, ItemStack.of(compoundTag2));
+            this.inventory.setItem(j, ItemStack.parse(this.registryAccess(), compoundTag2).orElse(ItemStack.EMPTY));
         }
     }
 
@@ -363,7 +361,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
             }
             if (this.isTame()) {
                 hamster.setOwnerUUID(this.getOwnerUUID());
-                hamster.setTame(true);
+                hamster.setTame(true, true);
             }
         }
         return hamster;

@@ -3,10 +3,12 @@ package com.ninni.spawn.mixin;
 import com.ninni.spawn.entity.variant.SeahorseVariant;
 import com.ninni.spawn.registry.SpawnEntityType;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
@@ -29,11 +31,14 @@ public abstract class MobBucketItemMixin extends BucketItem {
 
     @Inject(method = "appendHoverText", at = @At("HEAD"))
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag, CallbackInfo ci) {
-        CompoundTag compoundTag;
-        if (this.type == SpawnEntityType.SEAHORSE && (compoundTag = itemStack.getTag()) != null && compoundTag.contains("BucketVariantTag", 3)) {
-            int i = compoundTag.getInt("BucketVariantTag");
-            ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
-            list.add(Component.translatable("entity.spawn.seahorse.variant." + SeahorseVariant.byId(i).getSerializedName()).withStyle(chatFormattings));
+        if (this.type == SpawnEntityType.SEAHORSE) {
+            CustomData customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+            CompoundTag compoundTag = customData.copyTag();
+            if (compoundTag.contains("BucketVariantTag", 3)) {
+                int i = compoundTag.getInt("BucketVariantTag");
+                ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
+                list.add(Component.translatable("entity.spawn.seahorse.variant." + SeahorseVariant.byId(i).getSerializedName()).withStyle(chatFormattings));
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.ninni.spawn.block;
 
+import com.mojang.serialization.MapCodec;
 import com.ninni.spawn.registry.SpawnBlocks;
 import com.ninni.spawn.registry.SpawnItems;
 import net.minecraft.core.BlockPos;
@@ -21,12 +22,12 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-@SuppressWarnings("deprecation")
 public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock {
     public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
     private static final VoxelShape SAPLING_SHAPE = Block.box(3, 0, 3, 13, 6, 13);
     private static final VoxelShape MID_GROWTH_SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 
+    public static final MapCodec<SunflowerPlantBlock> CODEC = simpleCodec(SunflowerPlantBlock::new);
 
     public SunflowerPlantBlock(Properties properties) {
         super(properties);
@@ -34,7 +35,13 @@ public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock 
     }
 
     @Override
-    public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
+    protected MapCodec<? extends BushBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public void randomTick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos,
+            RandomSource randomSource) {
         int i = blockState.getValue(AGE);
         if (randomSource.nextInt(5) == 0 && serverLevel.getRawBrightness(blockPos.above(), 0) >= 9) {
             if (i < 3) {
@@ -43,22 +50,28 @@ public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock 
                 serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(blockState2));
             }
             if (i == 3) {
-                BlockState blockState2 = SpawnBlocks.SUNFLOWER.defaultBlockState().setValue(SunflowerBlock.HALF, DoubleBlockHalf.LOWER).setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
-                BlockState blockState3 = SpawnBlocks.SUNFLOWER.defaultBlockState().setValue(SunflowerBlock.HALF, DoubleBlockHalf.UPPER).setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
+                BlockState blockState2 = SpawnBlocks.SUNFLOWER.defaultBlockState()
+                        .setValue(SunflowerBlock.HALF, DoubleBlockHalf.LOWER)
+                        .setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
+                BlockState blockState3 = SpawnBlocks.SUNFLOWER.defaultBlockState()
+                        .setValue(SunflowerBlock.HALF, DoubleBlockHalf.UPPER)
+                        .setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
                 serverLevel.setBlock(blockPos, blockState2, 2);
-                serverLevel.setBlock(new BlockPos(blockPos.getX(), blockPos.getY() + 1, blockPos.getZ()), blockState3, 2);
+                serverLevel.setBlock(new BlockPos(blockPos.getX(), blockPos.getY() + 1, blockPos.getZ()), blockState3,
+                        2);
                 serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(blockState2));
             }
         }
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter blockGetter, BlockPos blockPos, BlockState blockState) {
+    public ItemStack getCloneItemStack(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return new ItemStack(SpawnItems.SUNFLOWER_SEEDS);
     }
 
     @Override
-    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos,
+            CollisionContext collisionContext) {
         if (blockState.getValue(AGE) == 0) {
             return SAPLING_SHAPE;
         }
@@ -69,7 +82,7 @@ public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock 
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState, boolean bl) {
+    public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
         return true;
     }
 
@@ -79,7 +92,8 @@ public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock 
     }
 
     @Override
-    public void performBonemeal(ServerLevel serverLevel, RandomSource randomSource, BlockPos blockPos, BlockState blockState) {
+    public void performBonemeal(ServerLevel serverLevel, RandomSource randomSource, BlockPos blockPos,
+            BlockState blockState) {
         int i = blockState.getValue(AGE);
         if (i < 3) {
             BlockState blockState2 = blockState.setValue(AGE, i + 1);
@@ -87,8 +101,12 @@ public class SunflowerPlantBlock extends BushBlock implements BonemealableBlock 
             serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(blockState2));
         }
         if (i == 3) {
-            BlockState blockState2 = SpawnBlocks.SUNFLOWER.defaultBlockState().setValue(SunflowerBlock.HALF, DoubleBlockHalf.LOWER).setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
-            BlockState blockState3 = SpawnBlocks.SUNFLOWER.defaultBlockState().setValue(SunflowerBlock.HALF, DoubleBlockHalf.UPPER).setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
+            BlockState blockState2 = SpawnBlocks.SUNFLOWER.defaultBlockState()
+                    .setValue(SunflowerBlock.HALF, DoubleBlockHalf.LOWER)
+                    .setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
+            BlockState blockState3 = SpawnBlocks.SUNFLOWER.defaultBlockState()
+                    .setValue(SunflowerBlock.HALF, DoubleBlockHalf.UPPER)
+                    .setValue(SunflowerBlock.ROTATION, SunflowerBlock.getRotationType(serverLevel));
             serverLevel.setBlock(blockPos, blockState2, 2);
             serverLevel.setBlock(new BlockPos(blockPos.getX(), blockPos.getY() + 1, blockPos.getZ()), blockState3, 2);
             serverLevel.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(blockState2));

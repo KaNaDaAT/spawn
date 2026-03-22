@@ -23,7 +23,7 @@ public interface SpawnEntityModelLayers {
     ModelLayerLocation ANT = main("ant", AntModel::getLayerDefinition);
 
     private static ModelLayerLocation register(String id, String name, EntityModelLayerRegistry.TexturedModelDataProvider provider) {
-        ModelLayerLocation layer = new ModelLayerLocation(new ResourceLocation(MOD_ID, id), name);
+        ModelLayerLocation layer = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(MOD_ID, id), name);
         EntityModelLayerRegistry.registerModelLayer(layer, provider);
         return layer;
     }

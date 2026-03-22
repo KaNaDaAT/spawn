@@ -1,6 +1,7 @@
 package com.ninni.spawn.block;
 
 
+import com.mojang.serialization.MapCodec;
 import com.ninni.spawn.entity.Snail;
 import com.ninni.spawn.registry.SpawnEntityType;
 import com.ninni.spawn.registry.SpawnItems;
@@ -17,13 +18,19 @@ import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.MultifaceSpreader;
 import net.minecraft.world.level.block.state.BlockState;
 
-@SuppressWarnings("deprecation")
 public class SnailEggsBlock extends MultifaceBlock {
     private final MultifaceSpreader spreader = new MultifaceSpreader(this);
+
+    public static final MapCodec<SnailEggsBlock> CODEC = simpleCodec(SnailEggsBlock::new);
 
 
     public SnailEggsBlock(Block.Properties settings) {
         super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends MultifaceBlock> codec() {
+        return CODEC;
     }
 
     @Override

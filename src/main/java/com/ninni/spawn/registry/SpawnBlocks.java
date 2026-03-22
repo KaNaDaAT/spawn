@@ -55,14 +55,14 @@ public class SpawnBlocks {
     public static final Block ROTTEN_PLANKS = register("rotten_planks", new StrippablePlankBlock(CRACKED_ROTTEN_PLANKS.defaultBlockState(), FabricBlockSettings.create().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BASS).strength(1.0f, 1.0f).sound(SpawnSoundEvents.ROTTEN_WOOD).ignitedByLava()));
     public static final Block ROTTEN_STAIRS = register("rotten_stairs", new StairBlock(ROTTEN_PLANKS.defaultBlockState(), FabricBlockSettings.copyOf(ROTTEN_PLANKS)));
     public static final Block ROTTEN_SLAB = register("rotten_slab", new SlabBlock(FabricBlockSettings.copyOf(ROTTEN_PLANKS)));
-    public static final Block ROTTEN_FENCE = register("rotten_fence", new FenceBlock(FabricBlockSettings.copy(ROTTEN_PLANKS).forceSolidOn()));
-    public static final Block ROTTEN_FENCE_GATE = register("rotten_fence_gate", new FenceGateBlock(FabricBlockSettings.copy(ROTTEN_PLANKS).forceSolidOn(), SpawnWoodType.ROTTEN));
-    public static final Block ROTTEN_DOOR = register("rotten_door", new DoorBlock(FabricBlockSettings.copy(ROTTEN_PLANKS).noOcclusion(), SpawnBlockSetType.ROTTEN));
-    public static final Block ROTTEN_TRAPDOOR = register("rotten_trapdoor", new TrapDoorBlock(FabricBlockSettings.copy(ROTTEN_PLANKS).noOcclusion().isValidSpawn(SpawnBlocks::never), SpawnBlockSetType.ROTTEN));
+    public static final Block ROTTEN_FENCE = register("rotten_fence", new FenceBlock(FabricBlockSettings.copyOf(ROTTEN_PLANKS).forceSolidOn()));
+    public static final Block ROTTEN_FENCE_GATE = register("rotten_fence_gate", new FenceGateBlock(SpawnWoodType.ROTTEN, FabricBlockSettings.copyOf(ROTTEN_PLANKS).forceSolidOn()));
+    public static final Block ROTTEN_DOOR = register("rotten_door", new DoorBlock(SpawnBlockSetType.ROTTEN, FabricBlockSettings.copyOf(ROTTEN_PLANKS).noOcclusion()));
+    public static final Block ROTTEN_TRAPDOOR = register("rotten_trapdoor", new TrapDoorBlock(SpawnBlockSetType.ROTTEN, FabricBlockSettings.copyOf(ROTTEN_PLANKS).noOcclusion().isValidSpawn(SpawnBlocks::never)));
     public static final Block FALLEN_LEAVES = register("fallen_leaves", new FallenLeavesBlock(FabricBlockSettings.create().noOcclusion().sound(SpawnSoundEvents.FALLEN_LEAVES).instabreak().ignitedByLava().pushReaction(PushReaction.DESTROY).mapColor(DyeColor.BROWN).noCollission()));
 
     private static Block register(String id, Block block) {
-        return Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(Spawn.MOD_ID, id), block);
+        return Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, id), block);
     }
 
     private static Boolean never(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, EntityType<?> entityType) {

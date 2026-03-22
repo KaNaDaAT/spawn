@@ -14,7 +14,7 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 
 @Environment(value=EnvType.CLIENT)
 public class AntRenderer extends MobRenderer<Ant, AntModel<Ant>> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/entity/ant/ant.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/ant/ant.png");
 
     public AntRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new AntModel<>(ctx.bakeLayer(SpawnEntityModelLayers.ANT)), 0.3F);

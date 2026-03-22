@@ -1,13 +1,13 @@
 package com.ninni.spawn.advancements;
 
-import com.google.gson.JsonObject;
-import net.minecraft.advancements.critereon.AbstractCriterionTriggerInstance;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.advancements.critereon.SimpleCriterionTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Optional;
 
 import static com.ninni.spawn.Spawn.MOD_ID;
 
@@ -15,7 +15,7 @@ public class SpawnCriterionTrigger extends SimpleCriterionTrigger<SpawnCriterion
     private final ResourceLocation ID;
 
     public SpawnCriterionTrigger(String id) {
-        ID = new ResourceLocation(MOD_ID, id);
+        ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, id);
     }
 
     public void trigger(ServerPlayer player) {
@@ -23,19 +23,15 @@ public class SpawnCriterionTrigger extends SimpleCriterionTrigger<SpawnCriterion
     }
 
     @Override
-    public ResourceLocation getId() {
-        return ID;
+    public Codec<TriggerInstance> codec() {
+        return TriggerInstance.CODEC;
     }
 
-    @Override
-    protected TriggerInstance createInstance(JsonObject jsonObject, ContextAwarePredicate contextAwarePredicate, DeserializationContext deserializationContext) {
-        return new TriggerInstance(ID, contextAwarePredicate);
-    }
-
-    public static class TriggerInstance extends AbstractCriterionTriggerInstance {
-
-        public TriggerInstance(ResourceLocation resourceLocation, ContextAwarePredicate contextAwarePredicate) {
-            super(resourceLocation, contextAwarePredicate);
-        }
+    public record TriggerInstance(Optional<ContextAwarePredicate> player) implements SimpleCriterionTrigger.SimpleInstance {
+        public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player)
+            ).apply(instance, TriggerInstance::new)
+        );
     }
 }

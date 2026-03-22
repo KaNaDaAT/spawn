@@ -11,6 +11,6 @@ public class SpawnConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> SMALL_ANTHILL = createKey("small_anthill");
 
     public static ResourceKey<ConfiguredFeature<?, ?>> createKey(String string) {
-        return ResourceKey.create(Registries.CONFIGURED_FEATURE, new ResourceLocation(Spawn.MOD_ID, string));
+        return ResourceKey.create(Registries.CONFIGURED_FEATURE, ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, string));
     }
 }

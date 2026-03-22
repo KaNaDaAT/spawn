@@ -32,14 +32,14 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class Tuna extends Animal {
     public Tuna(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
-        this.setPathfindingMalus(BlockPathTypes.WATER, 0.0f);
+        this.setPathfindingMalus(PathType.WATER, 0.0f);
         this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02f, 0.1f, true);
         this.lookControl = new SmoothSwimmingLookControl(this, 10);
     }
@@ -123,11 +123,6 @@ public class Tuna extends Animal {
         return new WaterBoundPathNavigation(this, level);
     }
 
-    @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return entityDimensions.height * 0.5f;
-    }
-
     protected void handleAirSupply(int i) {
         if (this.isAlive() && !this.isInWaterOrBubble()) {
             this.setAirSupply(i - 1);
@@ -151,13 +146,8 @@ public class Tuna extends Animal {
     }
 
     @Override
-    public boolean canBreatheUnderwater() {
-        return true;
-    }
-
-    @Override
-    public MobType getMobType() {
-        return MobType.WATER;
+    public int getMaxAirSupply() {
+        return TOTAL_AIR_SUPPLY;
     }
 
     @Override
@@ -169,19 +159,8 @@ public class Tuna extends Animal {
     public int getAmbientSoundInterval() {
         return 120;
     }
-
-    @Override
-    public int getExperienceReward() {
-        return 1 + this.level().random.nextInt(3);
-    }
-
     @Override
     public boolean isPushedByFluid() {
-        return false;
-    }
-
-    @Override
-    public boolean canBeLeashed(Player player) {
         return false;
     }
 

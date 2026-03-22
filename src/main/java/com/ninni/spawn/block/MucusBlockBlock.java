@@ -1,6 +1,5 @@
 package com.ninni.spawn.block;
 
-
 import com.ninni.spawn.SpawnProperties;
 import com.ninni.spawn.SpawnTags;
 import com.ninni.spawn.registry.SpawnCriteriaTriggers;
@@ -31,7 +30,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation")
 public class MucusBlockBlock extends Block {
     private static final IntegerProperty DISTANCE = BlockStateProperties.DISTANCE;
     public static final BooleanProperty SOLID = SpawnProperties.SOLID;
@@ -49,7 +47,8 @@ public class MucusBlockBlock extends Block {
     }
 
     @Override
-    public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
+    public BlockState updateShape(BlockState blockState, Direction direction, BlockState blockState2,
+            LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2) {
         int i;
         if ((i = getDistanceFromWater(blockState2) + 1) != 1 || blockState.getValue(DISTANCE) != i) {
             levelAccessor.scheduleTick(blockPos, this, 2);
@@ -63,15 +62,20 @@ public class MucusBlockBlock extends Block {
     }
 
     private static BlockState updateDistanceFromWater(BlockState state, Level world, BlockPos pos) {
-        int i = 7;
+        int distance = 7;
+        int oldDistance = state.getValue(DISTANCE);
         BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
         for (Direction direction : Direction.values()) {
             mutable.setWithOffset(pos, direction);
-            i = Math.min(i, getDistanceFromWater(world.getBlockState(mutable)) + 1);
-            if (i == 1) break;
+            distance = Math.min(distance, getDistanceFromWater(world.getBlockState(mutable)) + 1);
+            if (distance == 1)
+                break;
         }
-        world.playSound(null, pos, world.getBlockState(pos).getBlock().getSoundType(state).getBreakSound(), SoundSource.BLOCKS, 0.15F, 1.5F);
-        return state.setValue(DISTANCE, i).setValue(SOLID, i < 7);
+        if (distance != oldDistance) {
+            var soundType = state.getSoundType();
+            world.playSound(null, pos, soundType.getBreakSound(), SoundSource.BLOCKS, 0.15F, 1.5F);
+        }
+        return state.setValue(DISTANCE, distance).setValue(SOLID, distance < 7);
     }
 
     public static int getDistanceFromWater(BlockState state) {
@@ -86,23 +90,28 @@ public class MucusBlockBlock extends Block {
 
     @Override
     public void entityInside(BlockState blockState, Level level, BlockPos blockPos, Entity entity) {
-        if (!(entity instanceof LivingEntity) || entity.getType() == SpawnEntityType.SNAIL || entity.getType() == EntityType.BEE) {
+        if (!(entity instanceof LivingEntity) || entity.getType() == SpawnEntityType.SNAIL
+                || entity.getType() == EntityType.BEE) {
             return;
         }
-        if (entity instanceof ServerPlayer serverPlayer) SpawnCriteriaTriggers.GOT_STUCK_IN_MUCUS.trigger(serverPlayer);
+        if (entity instanceof ServerPlayer serverPlayer)
+            SpawnCriteriaTriggers.GOT_STUCK_IN_MUCUS.trigger(serverPlayer);
         entity.makeStuckInBlock(blockState, new Vec3(0.5f, 0.5, 0.5f));
     }
 
     @Override
-    public VoxelShape getCollisionShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+    public VoxelShape getCollisionShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos,
+            CollisionContext collisionContext) {
         return blockState.getValue(SOLID) ? Shapes.block() : SHAPE;
     }
 
     @Override
-    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, CollisionContext collisionContext) {
+    public VoxelShape getShape(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos,
+            CollisionContext collisionContext) {
         return Shapes.block();
     }
 
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SOLID, DISTANCE);
     }

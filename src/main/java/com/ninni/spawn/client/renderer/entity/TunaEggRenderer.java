@@ -14,25 +14,30 @@ import net.minecraft.util.Mth;
 
 import static com.ninni.spawn.Spawn.MOD_ID;
 
-@Environment(value=EnvType.CLIENT)
+@Environment(value = EnvType.CLIENT)
 public class TunaEggRenderer extends MobRenderer<TunaEgg, TunaEggModel> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/entity/tuna/tuna_egg.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID,
+            "textures/entity/tuna/tuna_egg.png");
 
     public TunaEggRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new TunaEggModel(ctx.bakeLayer(SpawnEntityModelLayers.TUNA_EGG)), 0.2F);
     }
 
     @Override
-    protected void setupRotations(TunaEgg egg, PoseStack poseStack, float f, float g, float h) {
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0f - g));
-        float i = (float)(egg.level().getGameTime() - egg.lastHit) + h;
-        if (i < 5.0f) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(Mth.sin(i / 1.5f * (float)Math.PI) * 3.0f));
+    protected void setupRotations(TunaEgg egg, PoseStack poseStack, float limbSwing, float limbSwingAmount,
+            float ageInTicks, float partialTick) {
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0f - limbSwingAmount));
+
+        float time = (float) (egg.level().getGameTime() - egg.lastHit) + ageInTicks;
+
+        if (time < 5.0f) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(
+                    Mth.sin(time / 1.5f * (float) Math.PI) * 3.0f));
         }
     }
 
     @Override
     public ResourceLocation getTextureLocation(TunaEgg entity) {
-        return  TEXTURE;
+        return TEXTURE;
     }
 }

@@ -8,6 +8,8 @@ import com.ninni.spawn.client.inventory.HamsterInventoryScreen;
 import com.ninni.spawn.client.particles.TunaEggParticle;
 import com.ninni.spawn.client.renderer.entity.*;
 import com.ninni.spawn.entity.Hamster;
+import com.ninni.spawn.registry.SpawnVanillaIntegration.Client.OpenHamsterScreenPayload;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
@@ -21,22 +23,23 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.registry.CompostingChanceRegistry;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.StrippableBlockRegistry;
-import net.fabricmc.fabric.mixin.biome.NetherBiomePresetMixin;
 import net.minecraft.client.particle.GlowParticle;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.GenerationStep;
-
-import java.util.Optional;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 
 public class SpawnVanillaIntegration {
-    public static final ResourceLocation OPEN_HAMSTER_SCREEN = new ResourceLocation(Spawn.MOD_ID, "open_hamster_screen");
+    public static final ResourceLocation OPEN_HAMSTER_SCREEN = ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID,
+            "open_hamster_screen");
 
     public static void serverInit() {
         registerBiomeModifications();
@@ -46,13 +49,19 @@ public class SpawnVanillaIntegration {
     }
 
     private static void registerBiomeModifications() {
-        BiomeModifications.create(new ResourceLocation(Spawn.MOD_ID, "replace_sunflower_patch")).add(ModificationPhase.REPLACEMENTS, biomeSelectionContext -> biomeSelectionContext.hasPlacedFeature(VegetationPlacements.PATCH_SUNFLOWER), biomeModificationContext -> {
-            BiomeModificationContext.GenerationSettingsContext generationSettings = biomeModificationContext.getGenerationSettings();
-            if (generationSettings.removeFeature(VegetationPlacements.PATCH_SUNFLOWER)) {
-                generationSettings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, SpawnPlacedFeatures.PATCH_SUNFLOWER);
-            }
-        });
-        BiomeModifications.addFeature(BiomeSelectors.tag(SpawnTags.SMALL_ANTHILL_GENERATES), GenerationStep.Decoration.VEGETAL_DECORATION, SpawnPlacedFeatures.SMALL_ANTHILL);
+        BiomeModifications.create(ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, "replace_sunflower_patch")).add(
+                ModificationPhase.REPLACEMENTS,
+                biomeSelectionContext -> biomeSelectionContext.hasPlacedFeature(VegetationPlacements.PATCH_SUNFLOWER),
+                biomeModificationContext -> {
+                    BiomeModificationContext.GenerationSettingsContext generationSettings = biomeModificationContext
+                            .getGenerationSettings();
+                    if (generationSettings.removeFeature(VegetationPlacements.PATCH_SUNFLOWER)) {
+                        generationSettings.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
+                                SpawnPlacedFeatures.PATCH_SUNFLOWER);
+                    }
+                });
+        BiomeModifications.addFeature(BiomeSelectors.tag(SpawnTags.SMALL_ANTHILL_GENERATES),
+                GenerationStep.Decoration.VEGETAL_DECORATION, SpawnPlacedFeatures.SMALL_ANTHILL);
     }
 
     private static void registerStrippables() {
@@ -100,24 +109,62 @@ public class SpawnVanillaIntegration {
             registerScreens();
         }
 
+        public record OpenHamsterScreenPayload(int entityId, int slotCount, int syncId)
+                implements CustomPacketPayload {
+
+            public static final Type<OpenHamsterScreenPayload> TYPE = CustomPacketPayload
+                    .createType("open_hamster_screen");
+
+            public static final StreamCodec<FriendlyByteBuf, OpenHamsterScreenPayload> CODEC = StreamCodec.ofMember(
+                    (payload, buf) -> {
+                        buf.writeInt(payload.entityId());
+                        buf.writeInt(payload.slotCount());
+                        buf.writeInt(payload.syncId());
+                    },
+                    buf -> new OpenHamsterScreenPayload(
+                            buf.readInt(),
+                            buf.readInt(),
+                            buf.readInt()));
+
+            @Override
+            public Type<? extends CustomPacketPayload> type() {
+                return TYPE;
+            }
+        }
+
         private static void registerScreens() {
-            ClientPlayNetworking.registerGlobalReceiver(OPEN_HAMSTER_SCREEN, (client, handler, buf, responseSender) -> {
-                int id = buf.readInt();
-                Level level = client.level;
-                Optional.ofNullable(level).ifPresent(world -> {
-                    Entity entity = world.getEntity(id);
-                    if (entity instanceof Hamster hamster) {
-                        int slotCount = buf.readInt();
-                        int syncId = buf.readInt();
-                        LocalPlayer clientPlayerEntity = client.player;
-                        SimpleContainer simpleInventory = new SimpleContainer(slotCount);
-                        assert clientPlayerEntity != null;
-                        HamsterInventoryMenu hamsterInventoryMenu = new HamsterInventoryMenu(syncId, clientPlayerEntity.getInventory(), simpleInventory, hamster);
-                        clientPlayerEntity.containerMenu = hamsterInventoryMenu;
-                        client.execute(() -> client.setScreen(new HamsterInventoryScreen(hamsterInventoryMenu, clientPlayerEntity.getInventory(), hamster)));
-                    }
-                });
-            });
+            PayloadTypeRegistry.playS2C().register(
+                    OpenHamsterScreenPayload.TYPE,
+                    OpenHamsterScreenPayload.CODEC);
+            ClientPlayNetworking.registerGlobalReceiver(OpenHamsterScreenPayload.TYPE,
+                    (payload, context) -> {
+                        var client = context.client();
+
+                        client.execute(() -> {
+                            Level level = client.level;
+                            if (level == null)
+                                return;
+
+                            Entity entity = level.getEntity(payload.entityId());
+                            if (!(entity instanceof Hamster hamster))
+                                return;
+
+                            LocalPlayer player = client.player;
+                            if (player == null)
+                                return;
+
+                            SimpleContainer inventory = new SimpleContainer(payload.slotCount());
+
+                            HamsterInventoryMenu menu = new HamsterInventoryMenu(
+                                    payload.syncId(),
+                                    player.getInventory(),
+                                    inventory,
+                                    hamster);
+
+                            player.containerMenu = menu;
+                            client.setScreen(new HamsterInventoryScreen(menu, player.getInventory(), hamster));
+                        });
+                    });
         }
 
         private static void registerBlockRenderLayers() {
@@ -125,15 +172,13 @@ public class SpawnVanillaIntegration {
                     SpawnBlocks.MUCUS,
                     SpawnBlocks.MUCUS_BLOCK,
                     SpawnBlocks.GHOSTLY_MUCUS_BLOCK,
-                    SpawnBlocks.SNAIL_EGGS
-            );
+                    SpawnBlocks.SNAIL_EGGS);
             BlockRenderLayerMap.INSTANCE.putBlocks(RenderType.cutout(),
                     SpawnBlocks.FALLEN_LEAVES,
                     SpawnBlocks.ANT_FARM,
                     SpawnBlocks.POTTED_SWEET_BERRY_BUSH,
                     SpawnBlocks.SUNFLOWER,
-                    SpawnBlocks.SUNFLOWER_PLANT
-            );
+                    SpawnBlocks.SUNFLOWER_PLANT);
         }
 
         private static void registerModelLayers() {
@@ -148,7 +193,8 @@ public class SpawnVanillaIntegration {
         }
 
         private static void registerParticles() {
-            ParticleFactoryRegistry.getInstance().register(SpawnParticles.ANGLER_FISH_LANTERN_GLOW, GlowParticle.GlowSquidProvider::new);
+            ParticleFactoryRegistry.getInstance().register(SpawnParticles.ANGLER_FISH_LANTERN_GLOW,
+                    GlowParticle.GlowSquidProvider::new);
             ParticleFactoryRegistry.getInstance().register(SpawnParticles.TUNA_EGG, TunaEggParticle.Factory::new);
         }
 

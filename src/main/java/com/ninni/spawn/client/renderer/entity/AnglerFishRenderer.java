@@ -19,8 +19,8 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 
 @Environment(EnvType.CLIENT)
 public class AnglerFishRenderer<E extends AnglerFish> extends MobRenderer<E, AnglerFishModel<E>> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/entity/angler_fish/angler_fish.png");
-    public static final ResourceLocation TEXTURE_DEFLATED = new ResourceLocation(MOD_ID, "textures/entity/angler_fish/angler_fish_deflated.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/angler_fish/angler_fish.png");
+    public static final ResourceLocation TEXTURE_DEFLATED = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/angler_fish/angler_fish_deflated.png");
     private final AnglerFishModel<E> normalModel, deflatedModel;
 
     public AnglerFishRenderer(EntityRendererProvider.Context context) {

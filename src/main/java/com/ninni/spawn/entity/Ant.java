@@ -31,7 +31,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -39,7 +38,6 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.LookControl;
-import net.minecraft.world.entity.ai.goal.BreedGoal;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -77,8 +75,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -121,31 +119,34 @@ public class Ant extends TamableAnimal implements NeutralMob{
         super(entityType, level);
         this.lookControl = new AntLookControl(this);
         this.remainingCooldownBeforeLocatingNewResource = Mth.nextInt(this.random, 200, 600);
-        this.setPathfindingMalus(BlockPathTypes.WATER, -1);
+        this.setPathfindingMalus(PathType.WATER, -1);
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(Mth.nextInt(this.getRandom(), 12, 20));
         this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(Mth.nextInt(this.getRandom(), 1, 3));
         this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(Mth.nextDouble(this.getRandom(), 0.225, 0.3));
-        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
+        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
     }
     
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(DATA_HAS_RESOURCE, false);
-        this.entityData.define(DATA_ABDOMEN_COLOR, DyeColor.RED.getId());
-        this.entityData.define(DATA_REMAINING_ANGER_TIME, 0);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_HAS_RESOURCE, false);
+        builder.define(DATA_ABDOMEN_COLOR, DyeColor.RED.getId());
+        builder.define(DATA_REMAINING_ANGER_TIME, 0);
     }
     
     public static float[] getColorArray(DyeColor dyeColor) {
         if (dyeColor == DyeColor.WHITE) {
             return new float[]{0.9019608F, 0.9019608F, 0.9019608F};
         }
-        float[] fs = dyeColor.getTextureDiffuseColors();
-        return new float[]{fs[0] * 0.75F, fs[1] * 0.75F, fs[2] * 0.75F};
+        int color = dyeColor.getTextureDiffuseColor();
+        float r = ((color >> 16) & 0xFF) / 255.0F;
+        float g = ((color >> 8) & 0xFF) / 255.0F;
+        float b = (color & 0xFF) / 255.0F;
+        return new float[]{r * 0.75F, g * 0.75F, b * 0.75F};
     }
     public DyeColor getAbdomenColor() {
         return DyeColor.byId(this.entityData.get(DATA_ABDOMEN_COLOR));
@@ -171,7 +172,7 @@ public class Ant extends TamableAnimal implements NeutralMob{
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.25, Ingredient.of(SpawnTags.ANT_TEMPTS), false));
         this.antGatherGoal = new AntGatherGoal();
         this.goalSelector.addGoal(4, this.antGatherGoal);
-        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0, 10.0f, 2.0f, false));
+        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.0, 10.0f, 2.0f));
         this.goalSelector.addGoal(5, new AntLocateAnthillGoal());
         this.goToAnthillGoal = new AntGoToAnthillGoal();
         this.goalSelector.addGoal(5, this.goToAnthillGoal);
@@ -266,11 +267,11 @@ public class Ant extends TamableAnimal implements NeutralMob{
         }
         this.anthillPos = null;
         if (compoundTag.contains(TAG_ANTHILL_POS)) {
-            this.anthillPos = NbtUtils.readBlockPos(compoundTag.getCompound(TAG_ANTHILL_POS));
+            this.anthillPos = NbtUtils.readBlockPos(compoundTag, TAG_ANTHILL_POS).orElse(null);
         }
         this.savedResourcePos = null;
         if (compoundTag.contains(TAG_RESOURCE_POS) && !this.isTame()) {
-            this.savedResourcePos = NbtUtils.readBlockPos(compoundTag.getCompound(TAG_RESOURCE_POS));
+            this.savedResourcePos = NbtUtils.readBlockPos(compoundTag, TAG_RESOURCE_POS).orElse(null);
         }
         super.readAdditionalSaveData(compoundTag);
         this.setHasResource(compoundTag.getBoolean(TAG_HAS_RESOURCE));
@@ -506,10 +507,7 @@ public class Ant extends TamableAnimal implements NeutralMob{
         return super.hurt(damageSource, f);
     }
 
-    @Override
-    public MobType getMobType() {
-        return MobType.ARTHROPOD;
-    }
+
 
     @Override
     protected void jumpInLiquid(TagKey<Fluid> tagKey) {

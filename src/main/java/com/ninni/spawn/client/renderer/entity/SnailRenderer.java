@@ -14,7 +14,7 @@ import static com.ninni.spawn.Spawn.MOD_ID;
 
 @Environment(value=EnvType.CLIENT)
 public class SnailRenderer<T extends LivingEntity> extends MobRenderer<Snail, SnailModel> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/entity/snail/snail.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/entity/snail/snail.png");
 
     public SnailRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new SnailModel(ctx.bakeLayer(SpawnEntityModelLayers.SNAIL)), 0.4F);

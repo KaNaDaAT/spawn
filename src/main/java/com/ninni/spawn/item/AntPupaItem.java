@@ -49,10 +49,10 @@ public class AntPupaItem extends Item {
 
         if (level instanceof ServerLevel serverLevel) {
             Consumer consumer = EntityType.createDefaultStackConfig(serverLevel, itemStack, useOnContext.getPlayer());
-            Ant ant = SpawnEntityType.ANT.create(serverLevel, itemStack.getTag(), consumer, blockPos, MobSpawnType.SPAWN_EGG, true, true);
+            Ant ant = SpawnEntityType.ANT.create(serverLevel, consumer, blockPos, MobSpawnType.SPAWN_EGG, true, true);
             if (ant == null) return InteractionResult.FAIL;
 
-            ant.setTame(true);
+            ant.setTame(true, true);
             ant.setOwnerUUID(useOnContext.getPlayer().getUUID());
             ant.setBaby(true);
 

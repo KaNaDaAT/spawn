@@ -11,7 +11,7 @@ public class SpawnBiomes {
     public static final ResourceKey<Biome> ANT_GARDENS = register("ant_gardens");
 
     private static ResourceKey<Biome> register(String string) {
-        return ResourceKey.create(Registries.BIOME, new ResourceLocation(Spawn.MOD_ID, string));
+        return ResourceKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, string));
     }
 
 }

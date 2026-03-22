@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
 public class HamsterInventoryScreen extends AbstractContainerScreen<HamsterInventoryMenu> {
-    private static final ResourceLocation HAMSTER_INVENTORY_LOCATION = new ResourceLocation(Spawn.MOD_ID, "textures/gui/container/hamster.png");
+    private static final ResourceLocation HAMSTER_INVENTORY_LOCATION = ResourceLocation.fromNamespaceAndPath(Spawn.MOD_ID, "textures/gui/container/hamster.png");
 
     public HamsterInventoryScreen(HamsterInventoryMenu abstractContainerMenu, Inventory inventory, Hamster hamster) {
         super(abstractContainerMenu, inventory, hamster.getDisplayName());
@@ -26,7 +26,7 @@ public class HamsterInventoryScreen extends AbstractContainerScreen<HamsterInven
 
     @Override
     protected void renderBg(GuiGraphics poseStack, float f, int i, int j) {
-        this.renderBackground(poseStack);
+        this.renderBackground(poseStack, i, j, f);
         int k = (this.width - this.imageWidth) / 2;
         int l = (this.height - this.imageHeight) / 2;
         poseStack.blit(HAMSTER_INVENTORY_LOCATION, k, l, 0, 0, this.imageWidth, this.imageHeight);

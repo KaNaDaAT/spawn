@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.ninni.spawn.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "AbstractFishMixin",
     "BlockEntityTypeMixin",
@@ -11,6 +11,7 @@
     "MobBucketItemAccessor",
     "MobBucketItemMixin",
     "OverworldBiomeBuilderMixin",
+    "SeahorseMixin",
     "ServerPlayerMixin"
   ],
   "client": [

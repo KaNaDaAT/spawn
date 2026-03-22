@@ -4,7 +4,9 @@ import com.ninni.spawn.entity.variant.SeahorseVariant;
 import com.ninni.spawn.registry.SpawnItems;
 import com.ninni.spawn.registry.SpawnSoundEvents;
 import net.minecraft.Util;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -36,23 +38,19 @@ public class Seahorse extends AbstractFish implements Bucketable {
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag compoundTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
         if (mobSpawnType != MobSpawnType.BUCKET) {
             SeahorseVariant[] variants = SeahorseVariant.values();
             SeahorseVariant variant = Util.getRandom(variants, serverLevelAccessor.getRandom());
             this.setVariant(variant);
         }
-        if (mobSpawnType == MobSpawnType.BUCKET && compoundTag != null && compoundTag.contains(BUCKET_VARIANT_TAG, 3)) {
-            this.setVariant(SeahorseVariant.byId(compoundTag.getInt(BUCKET_VARIANT_TAG)));
-            return spawnGroupData;
-        }
-        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData, compoundTag);
+        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, mobSpawnType, spawnGroupData);
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(VARIANT, SeahorseVariant.ORANGE.id());
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(VARIANT, SeahorseVariant.ORANGE.id());
     }
 
     @Override
@@ -68,11 +66,6 @@ public class Seahorse extends AbstractFish implements Bucketable {
         return Mob.createMobAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.65D)
                 .add(Attributes.MAX_HEALTH, 4.0);
-    }
-
-    @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions entityDimensions) {
-        return entityDimensions.height * 0.95F;
     }
 
     public SeahorseVariant getVariant() {
@@ -121,8 +114,9 @@ public class Seahorse extends AbstractFish implements Bucketable {
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
         super.saveToBucketTag(itemStack);
-        CompoundTag compoundTag = itemStack.getOrCreateTag();
-        compoundTag.putInt(BUCKET_VARIANT_TAG, this.getVariant().id());
+        CustomData.update(DataComponents.CUSTOM_DATA, itemStack, tag -> {
+            tag.putInt(BUCKET_VARIANT_TAG, this.getVariant().id());
+        });
     }
 
     @Override

@@ -14,17 +14,19 @@ import net.minecraft.world.entity.LivingEntity;
 
 import static com.ninni.spawn.Spawn.MOD_ID;
 
-@Environment(value=EnvType.CLIENT)
+@Environment(value = EnvType.CLIENT)
 public class TunaRenderer<T extends LivingEntity> extends MobRenderer<Tuna, TunaModel> {
-    public static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/entity/tuna/tuna.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MOD_ID,
+            "textures/entity/tuna/tuna.png");
 
     public TunaRenderer(EntityRendererProvider.Context ctx) {
         super(ctx, new TunaModel(ctx.bakeLayer(SpawnEntityModelLayers.TUNA)), 0.8F);
     }
 
     @Override
-    protected void setupRotations(Tuna tuna, PoseStack poseStack, float f, float g, float h) {
-        super.setupRotations(tuna, poseStack, f, g, h);
+    protected void setupRotations(Tuna tuna, PoseStack poseStack, float f, float g, float h, float partialTick) {
+        super.setupRotations(tuna, poseStack, f, g, h, partialTick);
+
         if (!tuna.isInWater()) {
             poseStack.translate(0.2f, 0.1f, 0.0f);
             poseStack.mulPose(Axis.ZP.rotationDegrees(90.0f));
@@ -33,6 +35,6 @@ public class TunaRenderer<T extends LivingEntity> extends MobRenderer<Tuna, Tuna
 
     @Override
     public ResourceLocation getTextureLocation(Tuna entity) {
-        return  TEXTURE;
+        return TEXTURE;
     }
 }

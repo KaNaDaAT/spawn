@@ -12,7 +12,7 @@ import net.minecraft.world.entity.monster.Spider;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(SpiderRenderer.class)
-@Environment(value= EnvType.CLIENT)
+@Environment(value = EnvType.CLIENT)
 public abstract class SpiderRendererMixin<T extends Spider> extends MobRenderer<T, SpiderModel<T>> {
 
     public SpiderRendererMixin(EntityRendererProvider.Context context, SpiderModel<T> entityModel, float f) {
@@ -20,8 +20,15 @@ public abstract class SpiderRendererMixin<T extends Spider> extends MobRenderer<
     }
 
     @Override
-    protected void setupRotations(T spider, PoseStack poseStack, float f, float g, float h) {
-        super.setupRotations(spider, poseStack, f, g, h);
+    protected void setupRotations(
+            T spider,
+            PoseStack poseStack,
+            float limbSwing,
+            float limbSwingAmount,
+            float ageInTicks,
+            float partialTick) {
+        super.setupRotations(spider, poseStack, limbSwing, limbSwingAmount, ageInTicks, partialTick);
+
         if (spider.isClimbing()) {
             poseStack.translate(0.0f, 0.25f, -0.25f);
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0f));
