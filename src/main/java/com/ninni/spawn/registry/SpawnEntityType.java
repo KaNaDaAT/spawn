@@ -68,7 +68,7 @@ public class SpawnEntityType {
                                 MobCategory.WATER_CREATURE,
                                 TUNA,
                                 15, 1, 1);
-
+                        
                 BiomeModifications.addSpawn(
                                 BiomeSelectors.tag(SpawnTags.SEAHORSE_SPAWNS),
                                 MobCategory.WATER_AMBIENT,

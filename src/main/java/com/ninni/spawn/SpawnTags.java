@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Block;
 
 import static com.ninni.spawn.Spawn.MOD_ID;
 
-@SuppressWarnings("unused")
 public interface SpawnTags {
 
     //Item tags

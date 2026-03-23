@@ -7,11 +7,9 @@
     "AbstractFishMixin",
     "BlockEntityTypeMixin",
     "CreativeModTabMixin",
-    "DecoratedPotPatternsMixin",
     "MobBucketItemAccessor",
     "MobBucketItemMixin",
     "OverworldBiomeBuilderMixin",
-    "SeahorseMixin",
     "ServerPlayerMixin"
   ],
   "client": [

@@ -7,6 +7,7 @@ import com.ninni.spawn.registry.SpawnEntityType;
 import com.ninni.spawn.registry.SpawnSoundEvents;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -43,10 +44,14 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class Hamster extends TamableAnimal implements InventoryCarrier, ContainerListener, HasCustomInventoryScreen {
-    public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(Hamster.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Float> PUFF_TICKS = SynchedEntityData.defineId(Hamster.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Hamster.class, EntityDataSerializers.BYTE);
-    static final Predicate<ItemEntity> ALLOWED_ITEMS = itemEntity -> !itemEntity.hasPickUpDelay() && itemEntity.isAlive();
+    public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(Hamster.class,
+            EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> PUFF_TICKS = SynchedEntityData.defineId(Hamster.class,
+            EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Hamster.class,
+            EntityDataSerializers.BYTE);
+    static final Predicate<ItemEntity> ALLOWED_ITEMS = itemEntity -> !itemEntity.hasPickUpDelay()
+            && itemEntity.isAlive();
     public final SimpleContainer inventory = new SimpleContainer(12);
 
     public Hamster(EntityType<? extends TamableAnimal> entityType, Level level) {
@@ -56,7 +61,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance, MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance,
+            MobSpawnType mobSpawnType, @Nullable SpawnGroupData spawnGroupData) {
         HamsterVariant[] variants = HamsterVariant.values();
         HamsterVariant variant = Util.getRandom(variants, serverLevelAccessor.getRandom());
         this.setVariant(variant);
@@ -65,7 +71,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
 
     @Override
     protected void registerGoals() {
-        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, Hamster.class, false, this::getTerritorialTarget));
+        this.targetSelector.addGoal(0,
+                new NearestAttackableTargetGoal<>(this, Hamster.class, false, this::getTerritorialTarget));
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new PanicGoal(this, 1.2));
@@ -83,7 +90,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     }
 
     private boolean getTerritorialTarget(LivingEntity livingEntity) {
-        return livingEntity instanceof Hamster hamster && hamster.isTame() && !hamster.isInSittingPose() && !this.isInSittingPose() && this.isTame() && hamster.getOwnerUUID() == this.getOwnerUUID();
+        return livingEntity instanceof Hamster hamster && hamster.isTame() && !hamster.isInSittingPose()
+                && !this.isInSittingPose() && this.isTame() && hamster.getOwnerUUID() == this.getOwnerUUID();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -101,30 +109,36 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (!this.level().isClientSide && player.isSecondaryUseActive() && player instanceof HamsterOpenContainer && this.isOwnedBy(player) && !this.isBaby()) {
-            if (player instanceof ServerPlayer serverPlayer) SpawnCriteriaTriggers.OPEN_HAMSTER_INVENTORY.trigger(serverPlayer);
+        if (!this.level().isClientSide && player.isSecondaryUseActive() && player instanceof HamsterOpenContainer
+                && this.isOwnedBy(player) && !this.isBaby()) {
+            if (player instanceof ServerPlayer serverPlayer)
+                SpawnCriteriaTriggers.OPEN_HAMSTER_INVENTORY.trigger(serverPlayer);
             this.openCustomInventoryScreen(player);
             return InteractionResult.SUCCESS;
         }
         if (this.level().isClientSide) {
-            boolean bl = this.isOwnedBy(player) || this.isTame() || itemStack.is(SpawnTags.HAMSTER_FEEDS) && !this.isTame();
+            boolean bl = this.isOwnedBy(player) || this.isTame()
+                    || itemStack.is(SpawnTags.HAMSTER_FEEDS) && !this.isTame();
             return bl ? InteractionResult.CONSUME : InteractionResult.PASS;
         }
         if (this.isTame()) {
             if (this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                if (!player.getAbilities().instabuild) itemStack.shrink(1);
+                if (!player.getAbilities().instabuild)
+                    itemStack.shrink(1);
                 this.heal(4f);
                 return InteractionResult.SUCCESS;
             }
             InteractionResult interactionResult = super.mobInteract(player, interactionHand);
-            if (interactionResult.consumesAction() && !this.isBaby() || !this.isOwnedBy(player)) return interactionResult;
+            if (interactionResult.consumesAction() && !this.isBaby() || !this.isOwnedBy(player))
+                return interactionResult;
             this.setOrderedToSit(!this.isOrderedToSit());
             this.jumping = false;
             this.navigation.stop();
             this.setTarget(null);
             return InteractionResult.SUCCESS;
         }
-        if (!itemStack.is(SpawnTags.HAMSTER_FEEDS)) return super.mobInteract(player, interactionHand);
+        if (!itemStack.is(SpawnTags.HAMSTER_FEEDS))
+            return super.mobInteract(player, interactionHand);
         if (!player.getAbilities().instabuild) {
             this.playSound(SpawnSoundEvents.HAMSTER_EAT, 1.0f, 1.0f);
             itemStack.shrink(1);
@@ -135,9 +149,10 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
             this.navigation.stop();
             this.setTarget(null);
             this.setOrderedToSit(true);
-            this.level().broadcastEntityEvent(this, (byte)7);
+            this.level().broadcastEntityEvent(this, (byte) 7);
             return InteractionResult.SUCCESS;
-        } else this.level().broadcastEntityEvent(this, (byte)6);
+        } else
+            this.level().broadcastEntityEvent(this, (byte) 6);
         return InteractionResult.SUCCESS;
     }
 
@@ -151,10 +166,12 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         if (!this.level().isClientSide) {
             float amount = 0;
             for (ItemStack itemStack : this.getInventory().items) {
-                if (itemStack.isEmpty()) amount = amount - 0.1f;
+                if (itemStack.isEmpty())
+                    amount = amount - 0.1f;
                 amount = amount + 0.1f;
             }
-            if (amount > 0.8f) amount = 0.8f;
+            if (amount > 0.8f)
+                amount = 0.8f;
             this.entityData.set(PUFF_TICKS, amount);
         }
 
@@ -167,7 +184,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
 
     @Override
     protected void pickUpItem(ItemEntity itemEntity) {
-        if (this.getInventory().canAddItem(itemEntity.getItem())) this.playSound(SpawnSoundEvents.HAMSTER_EAT, 1.0f, 1.0f);
+        if (this.getInventory().canAddItem(itemEntity.getItem()))
+            this.playSound(SpawnSoundEvents.HAMSTER_EAT, 1.0f, 1.0f);
         InventoryCarrier.pickUpItem(this, this, itemEntity);
     }
 
@@ -186,7 +204,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     protected int calculateFallDamage(float f, float g) {
         return super.calculateFallDamage(f, g) - 10;
     }
-    
+
     boolean canMove() {
         return !this.isStanding() && !this.isInSittingPose() && !this.isImmobile();
     }
@@ -195,7 +213,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(VARIANT, HamsterVariant.RUSSIAN.id());
-        builder.define(DATA_FLAGS_ID, (byte)0);
+        builder.define(DATA_FLAGS_ID, (byte) 0);
         builder.define(PUFF_TICKS, 0.0F);
     }
 
@@ -220,11 +238,12 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
 
     private void setFlag(int i, boolean bl) {
         if (bl) {
-            this.entityData.set(DATA_FLAGS_ID, (byte)(this.entityData.get(DATA_FLAGS_ID) | i));
+            this.entityData.set(DATA_FLAGS_ID, (byte) (this.entityData.get(DATA_FLAGS_ID) | i));
         } else {
-            this.entityData.set(DATA_FLAGS_ID, (byte)(this.entityData.get(DATA_FLAGS_ID) & ~i));
+            this.entityData.set(DATA_FLAGS_ID, (byte) (this.entityData.get(DATA_FLAGS_ID) & ~i));
         }
     }
+
     private boolean getFlag(int i) {
         return (this.entityData.get(DATA_FLAGS_ID) & i) != 0;
     }
@@ -232,17 +251,19 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
     public HamsterVariant getVariant() {
         return HamsterVariant.byId(this.entityData.get(VARIANT));
     }
+
     public void setVariant(HamsterVariant variant) {
         this.entityData.set(VARIANT, variant.id());
     }
 
     @Override
-    public void containerChanged(Container container) {}
+    public void containerChanged(Container container) {
+    }
 
     @Override
     public void openCustomInventoryScreen(Player player) {
         if (player instanceof ServerPlayer serverPlayer) {
-            ((HamsterOpenContainer)serverPlayer).openHamsterInventory(this, this.getInventory());
+            ((HamsterOpenContainer) serverPlayer).openHamsterInventory(this, this.getInventory());
         }
     }
 
@@ -250,9 +271,11 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         public HamsterMoveControl() {
             super(Hamster.this);
         }
+
         @Override
         public void tick() {
-            if (Hamster.this.canMove()) super.tick();
+            if (Hamster.this.canMove())
+                super.tick();
         }
     }
 
@@ -263,17 +286,23 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
 
         @Override
         public boolean canUse() {
-            if (!Hamster.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty()) return false;
-            if (Hamster.this.getTarget() != null || Hamster.this.getLastHurtByMob() != null) return false;
-            if (!Hamster.this.canMove()) return false;
-            if (Hamster.this.getRandom().nextInt(Hamster.HamsterSearchForItemsGoal.reducedTickDelay(10)) != 0) return false;
-            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class, Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
+            if (!Hamster.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty())
+                return false;
+            if (Hamster.this.getTarget() != null || Hamster.this.getLastHurtByMob() != null)
+                return false;
+            if (!Hamster.this.canMove())
+                return false;
+            if (Hamster.this.getRandom().nextInt(Hamster.HamsterSearchForItemsGoal.reducedTickDelay(10)) != 0)
+                return false;
+            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class,
+                    Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
             return !list.isEmpty() && Hamster.this.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty();
         }
 
         @Override
         public void tick() {
-            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class, Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
+            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class,
+                    Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
             ItemStack itemStack = Hamster.this.getItemBySlot(EquipmentSlot.MAINHAND);
             if (itemStack.isEmpty() && !list.isEmpty()) {
                 Hamster.this.getNavigation().moveTo(list.get(0), 1f);
@@ -282,7 +311,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
 
         @Override
         public void start() {
-            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class, Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
+            List<ItemEntity> list = Hamster.this.level().getEntitiesOfClass(ItemEntity.class,
+                    Hamster.this.getBoundingBox().inflate(8.0, 8.0, 8.0), ALLOWED_ITEMS);
             if (!list.isEmpty()) {
                 Hamster.this.getNavigation().moveTo(list.get(0), 1.2f);
             }
@@ -321,9 +351,10 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         ListTag listTag = new ListTag();
         for (int i = 2; i < this.inventory.getContainerSize(); ++i) {
             ItemStack itemStack = this.inventory.getItem(i);
-            if (itemStack.isEmpty()) continue;
+            if (itemStack.isEmpty())
+                continue;
             CompoundTag compoundTag2 = new CompoundTag();
-            compoundTag2.putByte("Slot", (byte)i);
+            compoundTag2.putByte("Slot", (byte) i);
             listTag.add(itemStack.save(this.registryAccess(), compoundTag2));
         }
         compoundTag.put("Items", listTag);
@@ -339,14 +370,17 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
         for (int i = 0; i < listTag.size(); ++i) {
             CompoundTag compoundTag2 = listTag.getCompound(i);
             int j = compoundTag2.getByte("Slot") & 0xFF;
-            if (j < 2 || j >= this.inventory.getContainerSize()) continue;
+            if (j < 2 || j >= this.inventory.getContainerSize())
+                continue;
             this.inventory.setItem(j, ItemStack.parse(this.registryAccess(), compoundTag2).orElse(ItemStack.EMPTY));
         }
     }
 
     @SuppressWarnings("unused")
-    public static boolean canSpawn(EntityType<Hamster> hamsterEntityType, ServerLevelAccessor world, MobSpawnType mobSpawnType, BlockPos pos, RandomSource randomSource) {
-        return world.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) && Animal.isBrightEnoughToSpawn(world, pos);
+    public static boolean canSpawn(EntityType<Hamster> hamsterEntityType, ServerLevelAccessor world,
+            MobSpawnType mobSpawnType, BlockPos pos, RandomSource randomSource) {
+        return world.getBlockState(pos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON)
+                && Animal.isBrightEnoughToSpawn(world, pos);
     }
 
     @Override
@@ -382,7 +416,7 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
             return Hamster.this.getLastHurtByMob() == null
                     && Hamster.this.getRandom().nextFloat() < 0.02f
                     && Hamster.this.getTarget() == null
-                    && Hamster.this.getNavigation().isDone() ;
+                    && Hamster.this.getNavigation().isDone();
         }
 
         @Override
@@ -410,7 +444,8 @@ public class Hamster extends TamableAnimal implements InventoryCarrier, Containe
                 --this.looksRemaining;
                 this.resetLook();
             }
-            Hamster.this.getLookControl().setLookAt(Hamster.this.getX() + this.relX, Hamster.this.getEyeY(), Hamster.this.getZ() + this.relZ, Hamster.this.getMaxHeadYRot(), Hamster.this.getMaxHeadXRot());
+            Hamster.this.getLookControl().setLookAt(Hamster.this.getX() + this.relX, Hamster.this.getEyeY(),
+                    Hamster.this.getZ() + this.relZ, Hamster.this.getMaxHeadYRot(), Hamster.this.getMaxHeadXRot());
         }
 
         private void resetLook() {

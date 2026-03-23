@@ -2,10 +2,6 @@
   "replace": false,
   "values": [
     "#spawn:hamster_feeds",
-    "minecraft:wheat_seeds",
-    "minecraft:melon_seeds",
-    "minecraft:pumpkin_seeds",
-    "minecraft:beetroot_seeds",
     "minecraft:carrot",
     "minecraft:apple",
     "minecraft:beetroot"

@@ -8,7 +8,6 @@ import com.ninni.spawn.client.inventory.HamsterInventoryScreen;
 import com.ninni.spawn.client.particles.TunaEggParticle;
 import com.ninni.spawn.client.renderer.entity.*;
 import com.ninni.spawn.entity.Hamster;
-import com.ninni.spawn.registry.SpawnVanillaIntegration.Client.OpenHamsterScreenPayload;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

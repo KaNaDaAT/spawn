@@ -2,7 +2,6 @@ package com.ninni.spawn.registry;
 
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;

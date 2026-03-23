@@ -1,6 +1,10 @@
 {
   "replace": false,
   "values": [
-    "spawn:sunflower_seeds"
+    "spawn:sunflower_seeds",
+    "minecraft:wheat_seeds",
+    "minecraft:melon_seeds",
+    "minecraft:pumpkin_seeds",
+    "minecraft:beetroot_seeds"
   ]
 }
