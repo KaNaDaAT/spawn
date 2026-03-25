@@ -3,13 +3,9 @@ package com.ninni.spawn.mixin;
 import com.ninni.spawn.client.inventory.HamsterInventoryMenu;
 import com.ninni.spawn.entity.Hamster;
 import com.ninni.spawn.entity.HamsterOpenContainer;
-import com.ninni.spawn.registry.SpawnVanillaIntegration;
 import com.ninni.spawn.registry.SpawnVanillaIntegration.Client.OpenHamsterScreenPayload;
 
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundHorseScreenOpenPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;

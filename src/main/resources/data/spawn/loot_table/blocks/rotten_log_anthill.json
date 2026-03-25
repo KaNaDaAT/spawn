@@ -23,15 +23,11 @@
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:copy_nbt",
-              "ops": [
-                {
-                  "op": "replace",
-                  "source": "Ants",
-                  "target": "BlockEntityTag.Ants"
-                }
-              ],
-              "source": "block_entity"
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": [
+                "minecraft:block_entity_data"
+              ]
             },
             {
               "block": "spawn:anthill",

@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -35,7 +34,6 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("deprecation")
 public class SunflowerBlock extends DoublePlantBlock implements BonemealableBlock, EntityBlock {
     public static final EnumProperty<SunflowerRotation> ROTATION = SpawnProperties.SUNFLOWER_ROTATION;
     public static final BooleanProperty SEEDS = SpawnProperties.SEEDS;

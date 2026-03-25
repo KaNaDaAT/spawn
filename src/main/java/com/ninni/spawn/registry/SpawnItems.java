@@ -4,7 +4,6 @@ import com.ninni.spawn.Spawn;
 import com.ninni.spawn.item.AntPupaItem;
 import com.ninni.spawn.item.EscargotItem;
 
-import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +16,6 @@ import net.minecraft.world.level.material.Fluids;
 
 public class SpawnItems {
 
-    @SuppressWarnings("unused")
     public static final Item SPAWN = register("spawn", new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
 
     // angler fish

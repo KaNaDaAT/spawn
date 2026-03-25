@@ -26,9 +26,14 @@ public class HamsterInventoryScreen extends AbstractContainerScreen<HamsterInven
 
     @Override
     protected void renderBg(GuiGraphics poseStack, float f, int i, int j) {
-        this.renderBackground(poseStack, i, j, f);
         int k = (this.width - this.imageWidth) / 2;
         int l = (this.height - this.imageHeight) / 2;
         poseStack.blit(HAMSTER_INVENTORY_LOCATION, k, l, 0, 0, this.imageWidth, this.imageHeight);
+    }
+
+    @Override
+    public void containerTick() {
+        super.containerTick();
+        this.menu.broadcastChanges();
     }
 }

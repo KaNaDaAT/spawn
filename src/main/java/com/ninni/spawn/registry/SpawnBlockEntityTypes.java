@@ -5,7 +5,6 @@ import com.ninni.spawn.block.entity.AnthillBlockEntity;
 import com.ninni.spawn.block.entity.SunflowerBlockEntity;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
