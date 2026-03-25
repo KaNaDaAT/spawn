@@ -7,7 +7,7 @@
     }
   ],
   "result": {
-    "item": "spawn:rotten_planks",
+    "id": "spawn:rotten_planks",
     "count": 4
   }
 }

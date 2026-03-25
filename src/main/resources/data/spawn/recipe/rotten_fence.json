@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "spawn:rotten_fence",
+    "id": "spawn:rotten_fence",
     "count": 3
   }
 }

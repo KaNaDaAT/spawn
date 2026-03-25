@@ -10,7 +10,7 @@
     }
   },
   "result": {
-    "item": "spawn:snail_shell_tiles",
+    "id": "spawn:snail_shell_tiles",
     "count": 4
   }
 }

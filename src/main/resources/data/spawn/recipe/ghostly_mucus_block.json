@@ -14,7 +14,7 @@
     }
   },
   "result": {
-    "item": "spawn:ghostly_mucus_block",
+    "id": "spawn:ghostly_mucus_block",
     "count": 4
   }
 }

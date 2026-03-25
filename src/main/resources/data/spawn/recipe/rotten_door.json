@@ -12,7 +12,7 @@
     }
   },
   "result": {
-    "item": "spawn:rotten_door",
+    "id": "spawn:rotten_door",
     "count": 3
   }
 }

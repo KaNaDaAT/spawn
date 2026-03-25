@@ -6,5 +6,7 @@
   "ingredient": {
     "item": "spawn:sunflower_seeds"
   },
-  "result": "spawn:roasted_sunflower_seeds"
+  "result": {
+    "id": "spawn:roasted_sunflower_seeds"
+  }
 }

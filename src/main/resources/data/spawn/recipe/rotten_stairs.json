@@ -12,7 +12,7 @@
     }
   },
   "result": {
-    "item": "spawn:rotten_stairs",
+    "id": "spawn:rotten_stairs",
     "count": 4
   }
 }

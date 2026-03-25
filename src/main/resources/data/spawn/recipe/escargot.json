@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "spawn:escargot",
+    "id": "spawn:escargot",
     "count": 1
   }
 }

@@ -15,7 +15,7 @@
     }
   ],
   "result": {
-    "item": "spawn:tuna_sandwich",
+    "id": "spawn:tuna_sandwich",
     "count": 1
   }
 }

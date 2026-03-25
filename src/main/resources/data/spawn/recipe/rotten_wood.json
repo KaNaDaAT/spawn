@@ -11,7 +11,7 @@
     }
   },
   "result": {
-    "item": "spawn:rotten_wood",
+    "id": "spawn:rotten_wood",
     "count": 3
   }
 }

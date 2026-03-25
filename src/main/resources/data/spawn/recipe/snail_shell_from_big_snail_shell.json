@@ -6,7 +6,7 @@
     }
   ],
   "result": {
-    "item": "spawn:snail_shell",
+    "id": "spawn:snail_shell",
     "count": 9
   }
 }

@@ -11,7 +11,7 @@
     }
   },
   "result": {
-    "item": "spawn:snail_shell_tile_stairs",
+    "id": "spawn:snail_shell_tile_stairs",
     "count": 4
   }
 }

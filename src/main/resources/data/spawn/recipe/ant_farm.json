@@ -17,7 +17,7 @@
     }
   },
   "result": {
-    "item": "spawn:ant_farm",
+    "id": "spawn:ant_farm",
     "count": 1
   }
 }
