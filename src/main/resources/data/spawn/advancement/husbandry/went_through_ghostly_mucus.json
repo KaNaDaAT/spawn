@@ -1,28 +1,28 @@
 {
   "parent": "spawn:husbandry/obtain_mucus",
   "criteria": {
-    "got_stuck_in_mucus": {
-      "trigger": "spawn:got_stuck_in_mucus"
+    "went_through_ghostly_mucus": {
+      "trigger": "spawn:went_through_ghostly_mucus"
     }
   },
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.spawn.got_stuck_in_mucus.description"
+      "translate": "advancements.spawn.went_through_ghostly_mucus.description"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "spawn:mucus_block"
+      "id": "spawn:ghostly_mucus_block"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.spawn.got_stuck_in_mucus.title"
+      "translate": "advancements.spawn.went_through_ghostly_mucus.title"
     }
   },
   "requirements": [
     [
-      "got_stuck_in_mucus"
+      "went_through_ghostly_mucus"
     ]
   ],
   "sends_telemetry_event": true

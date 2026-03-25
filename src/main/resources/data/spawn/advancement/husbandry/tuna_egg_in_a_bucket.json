@@ -20,7 +20,7 @@
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "spawn:tuna_egg_bucket"
+      "id": "spawn:tuna_egg_bucket"
     },
     "show_toast": true,
     "title": {

@@ -1,12 +1,12 @@
 {
-  "parent": "minecraft:husbandry/root",
+  "parent": "spawn:husbandry/obtain_ant_pupa",
   "criteria": {
-    "obtain_snail_shell": {
+    "obtain_ant_farm": {
       "conditions": {
         "items": [
           {
             "items": [
-              "spawn:snail_shell"
+              "spawn:ant_farm"
             ]
           }
         ]
@@ -17,21 +17,21 @@
   "display": {
     "announce_to_chat": true,
     "description": {
-      "translate": "advancements.spawn.obtain_snail_shell.description"
+      "translate": "advancements.spawn.obtain_ant_farm.description"
     },
     "frame": "task",
-    "hidden": true,
+    "hidden": false,
     "icon": {
-      "item": "spawn:snail_shell"
+      "id": "spawn:ant_farm"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancements.spawn.obtain_snail_shell.title"
+      "translate": "advancements.spawn.obtain_ant_farm.title"
     }
   },
   "requirements": [
     [
-      "obtain_snail_shell"
+      "obtain_ant_farm"
     ]
   ],
   "sends_telemetry_event": true

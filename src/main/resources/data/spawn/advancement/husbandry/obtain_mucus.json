@@ -22,7 +22,7 @@
     "frame": "task",
     "hidden": true,
     "icon": {
-      "item": "spawn:mucus"
+      "id": "spawn:mucus"
     },
     "show_toast": true,
     "title": {
